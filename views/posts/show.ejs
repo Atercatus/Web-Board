@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <% include ../parts/header %>
+</head>
+
+<body>
+    <% include ../parts/nav %>
+    <div class="container post post-show">
+        <div class="buttons">
+            <a class="btn btn-default" href="/posts?<%= urlQuery %>">Back</a>
+            <% if(isAuthenticated && currentUser.id == post.author.id) { %>
+            <a class="btn btn-default" href="/posts/<%= post._id%>/edit">Edit</a>
+            <form action="/posts/<%= post._id%>?_method=delete" method="post">
+                <a class="btn btn-default" href="#" onclick="confirm('Do you want to delete this?')?this.parentElement.submit():null;">Delete</a>
+            </form>
+            <% } %>
+        </div>
+
+        <div class="contentBox">
+            <h3 class="contentBoxTop post-title"><%= post.title %></h3>
+            <div class="row">
+                <div class="col col-sm-push-8" style="float:right">
+                    <div class="post-info">
+                        <div><span>Author</span> :
+                            <%= post.author ? post.author.username : "" %>
+                        </div>
+                        <div><span>Created</span> :
+                            <%= post.createdDate %>
+                            <%= post.createdTime %>
+                        </div>
+                        <% if(post.updatedAt) { %>
+                        <div><span>Updated</span> :
+                            <%= post.updatedDate%>
+                            <%= post.updatedTime%>
+                        </div>
+                        <%}%>
+                        <div><span>Views : </span>
+                            <%= post.views %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-sm-pull-4">
+                    <div class="post-body"><%= post.body %></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comments form-group">
+            <h4>Comments (
+                <%= post.comments?post.comments.length:"0" %>)</h4>
+            <% if(post.comments) { %>
+            <% post.comments.forEach(function(comment){ %>
+            <div class="comment row">
+                <b>
+                    <%= comment.author.username %></b>
+                (
+                <%= util.getDate(comment.createdAt) %>,
+                <%= util.getTime(comment.createdAt) %>)
+                <% if(currentUser && currentUser.equals(comment.author._id)) {%>
+                <form class="delete" method="post" action="/posts/<%= post.id %>/comments/<%= comment._id %>?_method=delete&<%= urlQuery %>">
+                    <button type="button" onclick="confirm('삭제하시겠습니까?')?this.parentElement.submit():null;">
+                        x
+                    </button>
+                </form>
+                <% } %>
+                <div class="body"><%= comment.body %></div>
+            </div>
+            <% }) %>
+            <% } %>
+
+            <% if(currentUser) { %>
+            <%  if(errs.comments){ %>
+            <span class="help-block">
+                <%=errs.comments.msg%></span>
+            <% } %>
+            <div class="form-group">
+                <form class="addComment" action="/posts/<%= post._id %>/comments?<%= urlQuery %>" method="post">
+                    <textarea class="form-control" type="text" name="body" placeholder="Add comment here"></textarea>
+                    <button class="form-control btn btn-default" type="submit">Comment</button>
+                </form>
+            </div>
+            <% } %>
+        </div>
+
+    </div>
+    <% include ../parts/footer %>

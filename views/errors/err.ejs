@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<% include ../parts/header %>
+</head>
+<body>
+<% include ../parts/nav %>
+<div class="container home home-about">
+    <div class="alert alert-warning">
+        <strong>Error!</strong> Please retry
+        <% if (err) {%>
+        <span><%= err %></span>
+        <% } %>
+    </div>
+</div>
+
+<% include ../parts/footer %>

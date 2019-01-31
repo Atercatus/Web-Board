@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <% include ../parts/header %>
+</head>
+
+<body>
+    <% include ../parts/nav %>
+    <div class="container post post-index">
+        <h2>Board</h2>
+        <div class="buttons">
+            <% if(isAuthenticated) {%>
+            <a class="btn btn-default" href="/posts/new">New</a>
+            <% } %>
+        </div>
+
+        <table class="table table-striped posts">
+            <thead>
+                <tr>
+                    <th class="postNum"">글번호</th>
+                    <th class=" title">제목</th>
+                    <th class="author">글쓴이</th>
+                    <th class="date">작성날짜</th>
+                    <th class="views">조회수</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(posts == null || posts.length == 0){ %>
+                <tr>
+                    <td class="noData" colspan=100> There is no data to show :( </td>
+                </tr>
+                <% } %>
+                <% let postNum = 0 + ((page-1) * 10); %>
+                <% posts.forEach(function(post) { %>
+                <% postNum++; %>
+                <tr>
+                    <td class="postNum">
+                        <%= postNum %>
+                    </td>
+                    <td>
+                        <a href="/posts/<%= post._id %>">
+                            <div class="ellipsis highlight" data-highlight="<%= search.highlight.title %>">
+                                <%= post.title %>
+                                <span class="comments">(<%= post.comments.length %>)</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td class="author">
+                        <div class="ellipsis highlight" data-highlight="<%= search.highlight.author %>">
+                            <%= post.author.username %>
+                        </div>
+                    </td>
+                    <td class="date">
+                        <%= post.createdDate %>
+                    </td>
+                    <td class="views">
+                        <%= post.views %>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!--Pagination-->
+        <div class="wrapper">
+            <ul>
+                <%
+                    let partialQuery;
+                    if(urlQuery)
+                        partialQuery = "&" + urlQuery.replace(/page=(.*?)(&|$)/ig, "");
+                %>
+                <!-- i:(ignore), g:(global), &(&), $(end of string), .(some letter), *(0 or more), ?(0 or 1) -->
+                <li><a href="/posts?page=1<%= partialQuery %>">[First]</a></li>
+                <% let start = page -4; %>
+                <% if(start <= 0) { %>
+                <% start = 1;  %>
+                <% }else if(page > maxPage - 5) {%>
+                <%start = maxPage - 9; }%>
+                <% for(let i = start; i < start + 10; i++) { %>
+                <%if( i > maxPage) {%>
+                <% break;}%>
+                <% if( i != page) { %>
+                <li>[<a href="/posts?page=<%= i %><%= partialQuery %>">
+                        <%= i %></a>]</li>
+                <% }  else { %>
+                <li>[<b>
+                        <%= i %></b>]</li>
+                <% } %>
+                <% } %>
+                <li><a href="/posts?page=<%=maxPage%><%= partialQuery %>">[Last]</a></li>
+                <!--
+                <% let offset = 5; %>
+                <% let i; %>
+                <% for(i=1; i <= maxPage; i++) { %>
+                <% if(i<=offset || i > maxPage-offset || (i >= page - (offset-1) && i<= page+(offset - 1))) { %>
+                <% if(i != page) { %>
+                <li>[<a href="/posts?page=<%= i %>">
+                        <%= i %></a>]</li>
+                <% } else { %>
+                <li>[<b>
+                        <%= i %></b>]</li>
+                <% } %>
+                <% } else if (i==offset+1 || si == maxPage-offset) { %>
+                <li>...</li>
+                <% } %>
+                <% } %>
+            -->
+            </ul>
+        </div>
+
+        <div class="search float_right">
+            <!-- for Script -->
+            <form class="checkValidation" action="/posts/" id="search">
+                <select name="searchType">
+                    <% let select %>
+                    <option value="title,body" <%=search.searchType=="title,body" ?select="selected" :"" %>>Title+Body</option>
+                    <option value="title" <%=search.searchType=="title" ?select="selected" :"" %>>Title</option>
+                    <option value="body" <%=search.searchType=="body" ?select="selected" :"" %>>Body</option>
+                    <option value="author" <%=search.searchType=="author" ?select="selected" :"" %>>Author</option>
+                </select>
+                <input class="cvMinLength" cvMinLength="3" cvMinLenErrTo="#searchError" cvMinLenErrMsg="It should be at least 3 characters"
+                    type="text" name="searchText" value="<%= select?search.searchText:"" %>">
+                <button type="submit">search</button>
+                <button type="button" onclick="window.location = '/posts?page=1'">Cancel</button>
+                <div class="message" id="searchError"></div>
+            </form>
+        </div>
+    </div> <!-- container end -->
+    <% include ../parts/footer %>

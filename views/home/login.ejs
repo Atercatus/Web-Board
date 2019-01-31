@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<% include ../parts/header %>
+</head>
+<body>
+<% include ../parts/nav %>
+
+<div class="container home home-login">
+
+    <form class="login-forim form-horizontal" action="/login" method="post">
+        <div class="contentBox">
+            <h3 class="contentBoxTop">Login</h3>
+            <fieldset>
+                <div class ="form-group <%= (errs.username)?'has-error':'' %>">
+                    <label for="username" class="col-sm-3 control-label">Username</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="username" name="username" 
+                        value="<%= username %>">
+                        <% if(errs.username) { %>
+                            <span class="help-block"><%= errs.username%></span>
+                            <% } %>
+                    </div>
+                </div>
+                <div class="form-group <%= (errs.password)?'has-error':''%>">
+                    <label for="password" class="col-sm-3 control-label">Password</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="password" id="password" name="password" value="">
+                        <% if(errs.password){ %>
+                            <span class="help-block"><%= errs.password %></span>
+                            <% } %>
+                    </div>
+                </div>
+                <% if (errs.login) {%>
+                    <div class="has-error">
+                        <span class="help-block"><%= errs.login %></span>
+                    </div>
+                    <% } %>
+            </fieldset>
+        </div>
+        <div class="buttons">
+            <input class="btn btn-default" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<% include ../parts/footer %>
